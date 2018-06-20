@@ -39,7 +39,6 @@ moves.textContent = totalMoves;
  */
 
 const shuffledCards = shuffle(cards);
-console.log('shuffledCards ', shuffledCards);
 
 let cardsFinished = 0;
 const cardLength = cards.length;
@@ -92,38 +91,41 @@ function incrementMoves() {
     moves.textContent = totalMoves;
 }
 
-function addToOpen(target) {
+function addToOpen(element) {
 
-    openedCards.push(target);
+    openedCards.push(element);
     const openedCardsLen = openedCards.length;
 
     if (openedCardsLen > 1) {
         for(let i=0; i < openedCardsLen-1; i++) {
-            console.log(i);
-            if (target.firstChild === openedCards[i].firstChild) {
+            // console.log('element.childNodes ', element.childNodes);
+            // console.log('openedCards[i].childNodes ', openedCards[i].childNodes);
+
+            if (/*element.childNodes[0] === openedCards[i].childNodes[0]*/element.firstElementChild.className === openedCards[i].firstElementChild.className) {
                 // LOCK THE CARDS IN THE OPEN POSITION
-                target.classList.add('match');
+                element.classList.add('match');
                 openedCards[i].classList.add('match');
-                console.log('match');
+                break;
             } else {
-                openedCards[i].classList.remove('open', 'show');
-                openedCards.slice(i);
-                console.log('openedCards ', openedCards);
+                setTimeout(function(){
+                    openedCards[i].classList.remove('open', 'show');
+                    openedCards.splice(i,1);
+                }, 1000);
+                
                 incrementMoves();
             }
         }
+        setTimeout(function(){
+            openedCards.pop();
+            element.classList.remove('open', 'show');
+        }, 1000);
     }
 }
-
-
-
 
 function openCard(e) {
     const cardClicked = e.target;
     cardClicked.classList.add('open', 'show');
-    console.log('event ', e);
-    // addToOpen(e.target);
-    setTimeout(addToOpen(e.target), 20000);
+    addToOpen(e.target);
 }
 
 deck.addEventListener('click',  openCard);
