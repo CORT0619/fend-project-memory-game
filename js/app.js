@@ -3,6 +3,7 @@ let timer = 0;
 let gameFinished = false;
 let intervalID = 0;
 let starRatingIntervalID = 0;
+let starRating = 3;
 const moves = document.querySelector('.moves');
 const deck = document.querySelector('.deck');
 const stars = document.querySelector('.stars');
@@ -67,6 +68,9 @@ function shuffle(array) {
  */
 
  function addCardstoBoard(dos) {
+     /*
+     * appends deck to the board
+     */
     let cardNum = 0;
     const cardLength = dos.length;
     const fragment = document.createDocumentFragment();
@@ -90,12 +94,15 @@ function shuffle(array) {
  }
 
 function incrementMoves() {
+    // calculate the number of moves made
     totalMoves++;
     moves.textContent = totalMoves;
 }
 
 function addToOpen(element) {
-
+    // checks if there is a match
+    // and if so marks it as a match
+    // turns back over card if no match 
     openedCards.push(element);
     const openedCardsLen = openedCards.length;
 
@@ -126,6 +133,7 @@ function addToOpen(element) {
 }
 
 function runTimer() {
+    // starts the timer
     intervalID = setInterval(function() {
         timer++;
         timerElement.textContent = timer;
@@ -141,12 +149,14 @@ function openCard(e) {
     }
     clicks++;
 
+    // turns over the cards
     const cardClicked = e.target;
     cardClicked.classList.add('open', 'show');
     addToOpen(e.target);
 }
 
 function resetCards() {
+    // removes all matches and resets the deck
     for(let i = 0; i < cards.length; i++) {
         let playingCard = document.querySelectorAll('.card');
         if (playingCard[i].classList.contains('match')) {
@@ -158,15 +168,19 @@ function resetCards() {
 }
 
 function decrementStarRating() {
+    // removes start after a certain number of time
     starRatingIntervalID = setInterval(function(){
         if (stars.firstChild) {
             stars.removeChild(stars.firstChild);
+            if (starRating > 0){
+                starRating--;
+            }
         }
     }, 6000);
 }
 
 function resetStars() {
-    // remove stars if there
+    // remove stars if there are any
     if (stars.firstChild) {
         while(stars.firstChild) {
             stars.removeChild(stars.firstChild);
@@ -175,12 +189,14 @@ function resetStars() {
 
     const starsFragment =  document.createDocumentFragment();
 
+    // add stars back
     for(let i = 0; i < 3; i++) {
         const starChild = document.createElement('li');
         starChild.innerHTML = `<i class="fa fa-star"></i>`;
         starsFragment.appendChild(starChild);
     }
     stars.appendChild(starsFragment);
+    starRating = 3;
 }
 
 function restartGame() {
@@ -212,6 +228,8 @@ function showModal() {
     const modalDisplay = document.createElement('div');
     modalDisplay.innerHTML = `<h2>Congratulations!</h2>
         <h4>Would you like to play again?</h4>
+        <p>Star Rating: ${starRating}</p>
+        <p>Completion Time: ${timer}</p> seconds
         <button id="playAgain">Play again</button>
         <button id="stopPlay">No</button>
     `;
@@ -244,18 +262,26 @@ function showModal() {
 }
 
 function gameOver() {
+    /*
+    * resets the timers and shows the game over modal 
+    */
+
     // stop timer
     clearInterval(intervalID);
     clearInterval(starRatingIntervalID);
-    timer,clicks,intervalID,starRatingIntervalID = 0;
-    timerElement.textContent = timer;
+    clicks = 0;
+    intervalID = 0;
+    starRatingIntervalID = 0;
     showModal();
+    timer = 0;
+    timerElement.textContent = timer;
 }
 
 function checkForGameOver() {
 
     let count = 0;
 
+    // checks to see if each card has a match
     for(let i=0; i < cards.length; i++) {
         
         let currentCard = document.querySelectorAll('.card');
@@ -263,6 +289,7 @@ function checkForGameOver() {
             count++;
         }
     }
+    // if all cards have a catch then the game is over
     if (count === cards.length) {
         gameOver();
     }
@@ -276,6 +303,7 @@ restart.addEventListener('click', function(){
 
     gameFinished = true;
 
+    // stop timers and reset 
     clearInterval(intervalID);
     clearInterval(starRatingIntervalID);
     timer = 0;
@@ -283,7 +311,6 @@ restart.addEventListener('click', function(){
     intervalID = 0;
     starRatingIntervalID = 0;
     timerElement.textContent = timer;
-    console.log('timer ', timer);
     // game finished
     restartGame();
 });
